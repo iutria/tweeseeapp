@@ -44,29 +44,12 @@ class User {
     List nodos = [];
     for (var i = 0; i < followers.length; i++) {
       User user = User.fromMap2(followers['$i']);
-      nodos.add({'from':this, 'to':user});
-      for (var j = 0; j < followers['$i']['followers'].length; j++) {
-        User us = User.fromMap2(followers['$i']['followers']['$j']);
-        nodos.add(
-          {
-            'from':user,
-            'to':us
-          }
-        );
-      }
+      nodos.add(user);
     }
     
     for (var i = 0; i < followings.length; i++) {
       User user = User.fromMap2(followings['$i']);
-      for (var j = 0; j < followings['$i']['followings'].length; j++) {
-        User us = User.fromMap2(followings['$i']['followings']['$j']);
-        nodos.add(
-          {
-            'from':user,
-            'to':us
-          }
-        );
-      }
+      nodos.add(user);
     }
     return nodos;
   }

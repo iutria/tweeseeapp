@@ -8,45 +8,51 @@ class Grafica extends StatelessWidget {
 
   final User user;
 
-  const Grafica({super.key, required this.user});
+  Grafica({super.key, required this.user});
+
+  Graph graph = Graph();
+
+  cargarGrafica(){
+    Node u = Node.Id(user);
+    for (var item in user.getRelations) {
+      graph.addEdge(u, Node.Id(item));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    Graph graph = Graph();
-    late Algorithm builder;
     Size size = MediaQuery.of(context).size;
-
-    for (var item in user.getRelations) {
-      // graph.addEdge(Node.Id(item['from']), Node.Id(user));
-      graph.addEdge(Node.Id(item['from']), Node.Id(item['to']));
-    }
+    late Algorithm builder;
+    cargarGrafica();
 
     builder = FruchtermanReingoldAlgorithm(iterations: 1000);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: InteractiveViewer(
-            constrained: false,
-            transformationController: TransformationController(),
-            child: SizedBox(
-              width: size.width,
-              height: size.height,
-              child: Center(
-                child: GraphView(
-                  graph: graph,
-                  algorithm: builder,
-                  paint: Paint()..color = Colors.green..strokeWidth = 1..style = PaintingStyle.fill,
-                  builder: (node) {
-                    return rectangWidget(node.key!.value);
-                  }
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: InteractiveViewer(
+              constrained: false,
+              transformationController: TransformationController(),
+              child: SizedBox(
+                width: size.width,
+                height: size.height,
+                child: Center(
+                  child: GraphView(
+                    graph: graph,
+                    algorithm: builder,
+                    paint: Paint()..color = Colors.green..strokeWidth = 1..style = PaintingStyle.fill,
+                    builder: (node) {
+                      return rectangWidget(node.key!.value);
+                    }
+                  ),
                 ),
-              ),
-            )
+              )
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

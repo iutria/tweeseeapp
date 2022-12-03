@@ -13,10 +13,9 @@ class ConsultaController extends GetxController {
   final user = User().obs;
 
   Future buscar()async{
-    dynamic response = await ConsultaRepository().buscar(txtBuscar.text);
-    print(response);
+    user.value = User();
+    dynamic response = await ConsultaRepository().buscar(txtBuscar.text.trim());
     user.value = User.fromJson(response);
-    print(user.value.toString());
   }
 }
 

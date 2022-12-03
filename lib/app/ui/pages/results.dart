@@ -13,51 +13,26 @@ class ResultsPage extends GetView {
   ConsultaController consulta = Get.find();
 
   ResultsPage({super.key, required this.busqueda});
-  
-  List items = [
-    {
-      'texto': 'Usuarios',
-      'child': UserResults()
-    },
-    // {
-    //   'texto': 'Publicaciones',
-    //   'child': Text('asssssd',)
-    // },
-  ];
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: items.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Inputs(
-            icon: true,
-            titulo: 'Buscar en twitter',
-            controller: consulta.txtBuscar,
-            accion: (){
-              consulta.buscar();
-            },
-          ),
-          // bottom: TabBar(
-          //   tabs: items.map((e) => Text(e['texto'])).toList(),
-          //   indicator: const UnderlineTabIndicator(
-          //     borderSide: BorderSide(
-          //       width: 3, 
-          //       color: Color(0xff6204BF),
-          //     )
-          //   ),
-          // ),
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          backgroundColor: Colors.black,
+    return Scaffold(
+      appBar: AppBar(
+        title: Inputs(
+          icon: true,
+          titulo: 'Buscar en twitter',
+          controller: consulta.txtBuscar,
+          accion: (){
+            consulta.buscar();
+          },
         ),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         backgroundColor: Colors.black,
-        body: UserResults()
-        // body: TabBarView(
-        //   children: items.map((e) => Tab(child: e['child'],)).toList(),
-        // )
       ),
+      backgroundColor: Colors.black,
+      // body: Obx(() => consulta.user == null ? CircularProgressIndicator() : UserResults(),)
+      body: UserResults(),
     );
   }
 }
@@ -75,7 +50,7 @@ class UserResults extends StatelessWidget {
     return Obx((){return ListView(
       children: [
         const SizedBox(height: 20,),
-        consulta.user.value.id==null ?Container(): ListTile(
+        consulta.user.value.id==null ?Center(child: CircularProgressIndicator()): ListTile(
           title: Text(consulta.user.value.name),
           subtitle: Text(consulta.user.value.username),
           tileColor: Colors.grey,
@@ -91,20 +66,90 @@ class DetailsUserPage extends GetView{
 
   final User user;
 
-  DetailsUserPage({ required this.user });
+  const DetailsUserPage({super.key,  required this.user });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(user.name),
-        centerTitle: true,
-        actions: [
-          IconButton(onPressed: (){print(user.getRelations);}, icon: Icon(Icons.add))
-        ],
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(user.name),
+              Text(user.username, style: TextStyle(fontSize: 10),),
+            ],
+          ),
+          centerTitle: false,
+          bottom: const  TabBar(
+            tabs: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text('Seguidores'),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text('Seguidos'),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text('Grafica'),
+              ),
+            ],
+            indicator:  UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 3, 
+                color: Color(0xff6204BF),
+              )
+            ),
+          ),
+        ),
+        body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            followers(user: user),
+            followings(user: user),
+            Grafica(user: user)
+          ],
+        )
       ),
-      body: Grafica(user: user,)
     );
   }
 }
 
+
+class followers extends StatelessWidget {
+
+  final User user;
+  const followers({super.key, required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: List.generate(
+        user.followers.length, 
+        (index) => ListTile(
+            title: Text('${user.followers['$index']['name']}'),
+            subtitle: Text('${user.followers['$index']['username']}'),
+        )),
+    );
+  }
+}
+class followings extends StatelessWidget {
+  final User user;
+  const followings({super.key, required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: List.generate(
+        user.followings.length, 
+        (index) => ListTile(
+            title: Text('${user.followings['$index']['name']}'),
+            subtitle: Text('${user.followings['$index']['username']}'),
+        )),
+    );
+  }
+}
